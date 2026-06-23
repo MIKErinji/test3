@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WEDDING DERBY BINGO</title>
+<style>
+  :root{
+    --navy: #0b1730;
+    --navy-deep: #060d1d;
+    --navy-light: #16264a;
+    --gold: #d4af6a;
+    --gold-bright: #f3d999;
+    --gold-line: #8a6f3a;
+    --white: #faf7ef;
+    --red: #c4453f;
+    --green: #2f8f5b;
+    --dirt: #8a6a45;
+    --dirt-dark: #6b4f30;
+    --rail: #f0ead8;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin:0;
+    padding:0;
+    background: radial-gradient(ellipse at top, var(--navy-light) 0%, var(--navy) 45%, var(--navy-deep) 100%);
+    color: var(--white);
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before{
+    content:"";
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(212,175,106,0.06) 0%, transparent 35%),
+      radial-gradient(circle at 90% 80%, rgba(212,175,106,0.06) 0%, transparent 35%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .app{
+    position: relative;
+    z-index: 1;
+    max-width: 1700px;
+    margin: 0 auto;
+    padding: 28px 36px 50px;
+  }
+
+  /* ===== HEADER ===== */
+  header{ text-align: center; margin-bottom: 22px; position: relative; }
+  .crest-line{ display:flex; align-items:center; justify-content:center; gap: 18px; margin-bottom: 6px; }
+  .crest-line .diamond{ width: 9px; height:9px; background: var(--gold); transform: rotate(45deg); box-shadow: 0 0 8px rgba(212,175,106,0.8); }
+  .crest-line .rule{ height:1px; width: 140px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+  .eyebrow{ letter-spacing: 0.45em; font-size: 14px; color: var(--gold-bright); font-family: "Helvetica Neue", Arial, sans-serif; font-weight: 300; }
+  h1.title{
+    font-size: 64px; letter-spacing: 0.12em; margin: 4px 0 2px;
+    background: linear-gradient(180deg, var(--gold-bright) 10%, var(--gold) 55%, #b9924f 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-shadow: 0 2px 18px rgba(212,175,106,0.25); font-weight: 700;
+  }
+  .subtitle{ font-size: 20px; color: rgba(250,247,239,0.75); letter-spacing: 0.08em; font-family: "Helvetica Neue", Arial, sans-serif; margin-bottom: 18px; }
+
+  /* ===== SETTINGS BAR ===== */
+  .settings-bar{
+    display:flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    border: 1px solid rgba(212,175,106,0.35); border-radius: 14px; padding: 16px 28px; backdrop-filter: blur(4px);
+  }
+  .settings-bar .field{ display:flex; align-items:center; gap: 10px; font-family: "Helvetica Neue", Arial, sans-serif; }
+  .settings-bar label{ font-size: 15px; color: var(--gold-bright); letter-spacing: 0.05em; white-space: nowrap; }
+  .settings-bar input[type=number]{
+    width: 84px; font-size: 20px; text-align:center; background: var(--navy-deep);
+    border: 1px solid var(--gold-line); color: var(--white); border-radius: 8px; padding: 7px 4px; font-family: inherit;
+  }
+  .settings-bar input[type=number]:focus{ outline: 2px solid var(--gold-bright); }
+  .settings-bar input:disabled{ opacity: 0.5; }
+  .settings-bar .divider{ width:1px; height: 28px; background: rgba(212,175,106,0.3); }
+  .stock-readout{ font-size: 15px; color: rgba(250,247,239,0.65); font-family: "Helvetica Neue", Arial, sans-serif; }
+  .stock-readout b{ color: var(--gold-bright); font-size:17px; }
+
+  button{ font-family: "Helvetica Neue", Arial, sans-serif; cursor: pointer; border: none; border-radius: 9px; transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease; }
+  button:active{ transform: translateY(1px) scale(0.98); }
+  button:focus-visible{ outline: 3px solid var(--gold-bright); outline-offset: 2px; }
+  .btn-reset{ background: transparent; border: 1px solid rgba(196,69,63,0.6); color: #e3938e; padding: 10px 20px; font-size: 14px; letter-spacing: 0.06em; }
+  .btn-reset:hover{ background: rgba(196,69,63,0.15); }
+  .btn-reset:disabled{ opacity: 0.35; cursor: not-allowed; }
+
+  /* ===== MAIN LAYOUT ===== */
+  .layout{ display:grid; grid-template-columns: 1fr 420px; gap: 28px; margin-top: 26px; align-items: start; }
+  @media (max-width: 1100px){ .layout{ grid-template-columns: 1fr; } }
+
+  .panel{
+    background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
+    border: 1px solid rgba(212,175,106,0.3); border-radius: 18px; padding: 26px; position: relative;
+  }
+  .panel::before{
+    content:""; position:absolute; top:10px; left:10px; right:10px; bottom:10px;
+    border: 1px solid rgba(212,175,106,0.12); border-radius: 12px; pointer-events:none;
+  }
+  .panel-title{
+    font-family: "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.2em; font-size: 14px; color: var(--gold-bright);
+    margin: 0 0 18px; display:flex; align-items:center; gap: 10px;
+  }
+  .panel-title::after{ content:""; flex:1; height:1px; background: linear-gradient(90deg, rgba(212,175,106,0.5), transparent); }
+
+  /* ===== STAGE (shared canvas for paddock / track / podium) ===== */
+  .stage{ position: relative; min-height: 820px; }
+
+  .commentary-banner{
+    position: absolute; top: -4px; left: 50%; transform: translate(-50%, -10px);
+    background: linear-gradient(90deg, rgba(212,175,106,0.18), rgba(212,175,106,0.32), rgba(212,175,106,0.18));
+    border: 1px solid rgba(212,175,106,0.55); border-radius: 30px; padding: 10px 30px;
+    font-family: "Helvetica Neue", Arial, sans-serif; font-size: 19px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--white); white-space: nowrap; opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 6; box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+  }
+  .commentary-banner.show{ opacity: 1; transform: translate(-50%, 0); }
+
+  /* ===== RACE TRACK (dirt course look) ===== */
+  .track-frame{
+    position: relative;
+    margin-top: 38px;
+    border-radius: 10px;
+    overflow: hidden;
+    background:
+      repeating-linear-gradient(78deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 2px, transparent 2px, transparent 26px),
+      linear-gradient(180deg, var(--dirt) 0%, var(--dirt-dark) 100%);
+    border: 1px solid rgba(0,0,0,0.3);
+  }
+  .rail{
+    height: 6px;
+    background: linear-gradient(90deg, var(--rail), #cfc6ab, var(--rail));
+    position: relative;
+  }
+  .rail::before{
+    content:"";
+    position:absolute; inset:0;
+    background: repeating-linear-gradient(90deg, transparent 0 56px, rgba(0,0,0,0.18) 56px 58px);
+  }
+  .pole{
+    position:absolute;
+    top: -2px;
+    width: 3px;
+    height: 14px;
+    background: var(--rail);
+  }
+  .pole::after{
+    content:"";
+    position:absolute;
+    top: -9px; left: -1px;
+    width: 9px; height: 7px;
+    background: var(--gold-bright);
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+  }
+  .start-gate-label, .goal-label{
+    position:absolute; top: 10px;
+    font-family: "Helvetica Neue", Arial, sans-serif; font-size: 12px; letter-spacing: 0.15em;
+    color: rgba(250,247,239,0.65); z-index: 2;
+  }
+  .start-gate-label{ left: 14px; }
+  .goal-label{ right: 38px; color: var(--gold-bright); }
+
+  .track{ position:relative; padding: 6px 0; }
+
+  .lane{
+    position: relative;
+    height: 76px;
+    display:flex;
+    align-items:center;
+  }
+  .lane + .lane{ border-top: 1px solid rgba(0,0,0,0.15); }
+
+  .finish-line{
+    position:absolute;
+    right: 30px; top: 0; bottom: 0; width: 4px;
+    background: repeating-linear-gradient(0deg, var(--gold-bright) 0 10px, var(--navy-deep) 10px 20px);
+    z-index: 2;
+  }
+
+  /* ----- horse component (shared by paddock & track) ----- */
+  .horse-unit{ position: relative; width: 130px; height: 81px; flex-shrink: 0; }
+  .horse-unit svg{ width: 100%; height: 100%; display:block; overflow: visible; }
+  .horse-bib{
+    position: absolute; left: 0; top: 50%;
+    transform: translate(0, -50%);
+    will-change: left;
+  }
+
+  .leg-fl, .leg-fr, .leg-bl, .leg-br{ transform-box: fill-box; transform-origin: top center; }
+  .tail-swing{ transform-box: fill-box; transform-origin: 90% 10%; }
+
+  @keyframes legSwingA{ 0%, 100%{ transform: rotate(26deg); } 50%{ transform: rotate(-22deg); } }
+  @keyframes legSwingB{ 0%, 100%{ transform: rotate(-22deg); } 50%{ transform: rotate(26deg); } }
+  @keyframes bodyBob{ 0%, 100%{ transform: translateY(0); } 50%{ transform: translateY(-4px); } }
+  @keyframes tailSway{ 0%, 100%{ transform: rotate(-5deg); } 50%{ transform: rotate(7deg); } }
+  @keyframes walkLegA{ 0%, 100%{ transform: rotate(13deg); } 50%{ transform: rotate(-11deg); } }
+  @keyframes walkLegB{ 0%, 100%{ transform: rotate(-11deg); } 50%{ transform: rotate(13deg); } }
+  @keyframes walkBob{ 0%, 100%{ transform: translateY(0); } 50%{ transform: translateY(-2px); } }
+
+  .horse-rig{ animation: bodyBob 0.32s ease-in-out infinite; }
+  .horse-rig .leg-fl, .horse-rig .leg-br{ animation: legSwingA 0.32s ease-in-out infinite; }
+  .horse-rig .leg-fr, .horse-rig .leg-bl{ animation: legSwingB 0.32s ease-in-out infinite; }
+  .horse-rig .tail-swing{ animation: tailSway 0.5s ease-in-out infinite; }
+
+  .horse-rig.walk{ animation: walkBob 0.85s ease-in-out infinite; }
+  .horse-rig.walk .leg-fl, .horse-rig.walk .leg-br{ animation: walkLegA 0.85s ease-in-out infinite; }
+  .horse-rig.walk .leg-fr, .horse-rig.walk .leg-bl{ animation: walkLegB 0.85s ease-in-out infinite; }
+  .horse-rig.walk .tail-swing{ animation: tailSway 1.1s ease-in-out infinite; }
+
+  .horse-rig.still{ animation: none; }
+  .horse-rig.still .leg-fl, .horse-rig.still .leg-fr, .horse-rig.still .leg-bl, .horse-rig.still .leg-br{ animation: none; transform: rotate(0deg); }
+  .horse-rig.still .tail-swing{ animation: none; }
+
+  .dust-puff{
+    position:absolute;
+    bottom: 6px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: rgba(230,220,200,0.55);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .dust-puff.d1{ left: 18px; animation: dustPop 0.64s ease-out infinite; }
+  .dust-puff.d2{ left: 34px; animation: dustPop 0.64s ease-out 0.32s infinite; }
+  @keyframes dustPop{
+    0%{ opacity: 0.55; transform: translate(0,0) scale(0.6); }
+    100%{ opacity: 0; transform: translate(-22px, 4px) scale(1.3); }
+  }
+  .horse-bib:not(.running) .dust-puff{ animation: none; opacity: 0; }
+
+  .speed-line{
+    position:absolute;
+    left: -36px;
+    height: 2px;
+    width: 30px;
+    background: linear-gradient(90deg, transparent, rgba(250,247,239,0.55));
+    opacity: 0;
+  }
+  .speed-line.s1{ top: 28px; }
+  .speed-line.s2{ top: 44px; }
+  .speed-line.s3{ top: 58px; }
+  .horse-bib.running .speed-line{ animation: speedFlicker 0.36s linear infinite; }
+  .speed-line.s2{ animation-delay: 0.1s !important; }
+  .speed-line.s3{ animation-delay: 0.2s !important; }
+  @keyframes speedFlicker{
+    0%{ opacity: 0; transform: scaleX(0.6); }
+    40%{ opacity: 0.8; transform: scaleX(1); }
+    100%{ opacity: 0; transform: scaleX(1.1); }
+  }
+
+  /* ===== overlays (countdown / paddock / podium) ===== */
+  .stage-overlay{
+    position:absolute; inset:0; background: rgba(6,13,29,0.92);
+    display:flex; align-items:center; justify-content:center; z-index: 10;
+    border-radius: 12px; opacity:0; pointer-events:none; transition: opacity 0.3s ease;
+  }
+  .stage-overlay.show{ opacity:1; pointer-events:auto; }
+
+  .countdown-text{
+    font-size: 96px; font-family: "Helvetica Neue", Arial, sans-serif; font-weight: 800;
+    color: var(--gold-bright); letter-spacing: 0.05em; text-shadow: 0 0 30px rgba(243,217,153,0.6);
+  }
+  .countdown-text.go{ color: #ffffff; font-size: 110px; }
+
+  /* ----- paddock yard ----- */
+  .paddock-inner{ display:flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; height: 100%; padding: 30px 0; }
+  .paddock-eyebrow{ font-family: "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.4em; font-size: 14px; color: var(--gold-bright); }
+  .paddock-counter{ font-family: "Helvetica Neue", Arial, sans-serif; font-size: 14px; color: rgba(250,247,239,0.5); letter-spacing: 0.1em; }
+
+  .paddock-yard{
+    position: relative;
+    width: 92%;
+    height: 320px;
+    margin-top: 6px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #c9b48a 0%, #b29a68 100%);
+    border: 1px solid rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+  }
+  .paddock-fence{
+    position:relative; flex-shrink: 0; height: 26px;
+    background: repeating-linear-gradient(90deg, var(--rail) 0 34px, transparent 34px 40px);
+    opacity: 0.85;
+  }
+  .paddock-fence::before{
+    content:"";
+    position:absolute; left:0; right:0; top: -8px; height: 4px;
+    background: var(--rail);
+  }
+  .paddock-horse-track{
+    position:relative;
+    flex: 1;
+    min-height: 0;
+  }
+  .paddock-horse-track .horse-unit{ width: 280px; height: 175px; position:absolute; }
+
+  .paddock-flavor{
+    flex-shrink: 0;
+    height: 48px;
+    display:flex; align-items:center; justify-content:center;
+    font-family: "Helvetica Neue", Arial, sans-serif; font-size: 16px; color: var(--navy-deep);
+    letter-spacing: 0.03em; font-weight: 600;
+  }
+  .paddock-walk-anim{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: -30%;
+    transition: left linear;
+  }
+
+  /* ----- podium ----- */
+  .podium-inner{ width: 100%; display:flex; flex-direction: column; align-items: center; gap: 30px; }
+  .podium-eyebrow{ font-family: "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.4em; font-size: 15px; color: var(--gold-bright); }
+  .podium-row{ display:flex; align-items: flex-end; justify-content: center; gap: 18px; width: 100%; padding: 0 20px; }
+  .podium-col{ display:flex; flex-direction:column; align-items:center; opacity: 0; transform: translateY(40px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .podium-col.show{ opacity: 1; transform: translateY(0); }
+  .podium-plate{
+    width: 76px; height: 76px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--gold-bright), var(--gold) 60%, #a9803f);
+    color: var(--navy-deep); font-weight: 700; font-family: "Helvetica Neue", Arial, sans-serif;
+    display:flex; align-items:center; justify-content:center; margin-bottom: 10px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.5); border: 3px solid var(--navy-deep);
+  }
+  .podium-block{
+    width: 130px; border-radius: 8px 8px 0 0;
+    background: linear-gradient(180deg, rgba(212,175,106,0.35), rgba(212,175,106,0.12));
+    border: 1px solid rgba(212,175,106,0.5); border-bottom: none;
+    display:flex; align-items:flex-start; justify-content:center; padding-top: 10px;
+    font-family: "Helvetica Neue", Arial, sans-serif; color: var(--gold-bright); letter-spacing: 0.1em; font-size: 14px;
+  }
+  .podium-col[data-rank="1"] .podium-plate{ width: 96px; height: 96px; font-size: 34px; }
+  .podium-col[data-rank="1"] .podium-block{ height: 150px; background: linear-gradient(180deg, rgba(243,217,153,0.5), rgba(212,175,106,0.18)); border-color: rgba(243,217,153,0.8); font-size: 16px; font-weight: 700; }
+  .podium-col[data-rank="2"] .podium-plate, .podium-col[data-rank="3"] .podium-plate{ font-size: 26px; }
+  .podium-col[data-rank="2"] .podium-block, .podium-col[data-rank="3"] .podium-block{ height: 105px; }
+  .podium-col[data-rank="4"] .podium-plate, .podium-col[data-rank="5"] .podium-plate{ font-size: 22px; }
+  .podium-col[data-rank="4"] .podium-block, .podium-col[data-rank="5"] .podium-block{ height: 68px; }
+  .podium-col[data-rank="1"] .podium-plate{ animation: winnerPulse 1.4s ease-in-out infinite; }
+  @keyframes winnerPulse{
+    0%, 100%{ box-shadow: 0 6px 18px rgba(0,0,0,0.5), 0 0 0 0 rgba(243,217,153,0.5); }
+    50%{ box-shadow: 0 6px 18px rgba(0,0,0,0.5), 0 0 0 14px rgba(243,217,153,0); }
+  }
+  .podium-continue{ margin-top: 6px; }
+
+  .confetti-piece{
+    position: fixed; top: -20px; width: 9px; height: 14px; z-index: 50; pointer-events: none;
+    opacity: 0.95; animation-name: confettiFall; animation-timing-function: ease-in; animation-fill-mode: forwards;
+  }
+  @keyframes confettiFall{ to{ transform: translateY(720px) rotate(540deg); opacity: 0.2; } }
+
+  .start-row{ margin-top: 24px; display:flex; justify-content:center; }
+  .btn-start{
+    background: linear-gradient(180deg, var(--gold-bright), var(--gold) 70%, #b9924f);
+    color: var(--navy-deep); font-size: 24px; font-weight: 700; letter-spacing: 0.18em;
+    padding: 18px 64px; border-radius: 50px; box-shadow: 0 6px 22px rgba(212,175,106,0.35);
+    font-family: "Helvetica Neue", Arial, sans-serif;
+  }
+  .btn-start:hover{ box-shadow: 0 8px 28px rgba(212,175,106,0.5); }
+  .btn-start:disabled{ opacity: 0.4; cursor: not-allowed; box-shadow:none; }
+
+  /* ===== SIDE PANEL ===== */
+  .side-stack{ display:flex; flex-direction:column; gap: 22px; }
+  .result-slot{
+    display:flex; align-items:center; gap: 16px; padding: 14px 16px; border-radius: 12px; margin-bottom: 10px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,106,0.15);
+    opacity: 0; transform: translateY(10px); animation: resultIn 0.6s ease forwards;
+  }
+  @keyframes resultIn{ to{ opacity:1; transform: translateY(0); } }
+  .result-rank{ font-family: "Helvetica Neue", Arial, sans-serif; font-size: 13px; letter-spacing: 0.1em; color: rgba(250,247,239,0.5); width: 50px; flex-shrink:0; }
+  .result-slot.rank-1 .result-rank{ color: var(--gold-bright); }
+  .result-number{
+    font-size: 46px; font-weight: 700; font-family: "Helvetica Neue", Arial, sans-serif; color: var(--gold-bright);
+    flex: 1; text-align:center; text-shadow: 0 0 18px rgba(243,217,153,0.35);
+  }
+  .result-slot.rank-1 .result-number{ font-size: 60px; }
+  .result-slot.rank-1{ border-color: rgba(243,217,153,0.55); background: linear-gradient(90deg, rgba(212,175,106,0.12), rgba(212,175,106,0.02)); }
+  .result-empty{ color: rgba(250,247,239,0.3); font-family: "Helvetica Neue", Arial, sans-serif; font-size: 14px; text-align:center; padding: 30px 0; letter-spacing: 0.05em; }
+
+  .history-grid{ display:flex; flex-wrap: wrap; gap: 8px; max-height: 360px; overflow-y: auto; padding-right: 4px; }
+  .history-grid::-webkit-scrollbar{ width: 6px; }
+  .history-grid::-webkit-scrollbar-thumb{ background: rgba(212,175,106,0.4); border-radius: 4px; }
+  .history-chip{
+    width: 50px; height: 50px; border-radius: 50%; background: var(--navy-deep);
+    border: 1.5px solid var(--gold-line); color: var(--gold-bright);
+    display:flex; align-items:center; justify-content:center;
+    font-family: "Helvetica Neue", Arial, sans-serif; font-size: 18px; font-weight: 700; flex-shrink:0;
+  }
+  .history-count{ font-family: "Helvetica Neue", Arial, sans-serif; font-size: 13px; color: rgba(250,247,239,0.45); margin-bottom: 12px; letter-spacing: 0.05em; }
+
+  .footer-note{ text-align:center; margin-top: 30px; font-size: 12px; color: rgba(250,247,239,0.3); font-family: "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.1em; }
+
+  @media (prefers-reduced-motion: reduce){
+    .horse-rig, .horse-rig .leg-fl, .horse-rig .leg-fr, .horse-rig .leg-bl, .horse-rig .leg-br, .horse-rig .tail-swing{ animation: none !important; }
+    .podium-col[data-rank="1"] .podium-plate{ animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header>
+    <div class="crest-line"><span class="rule"></span><span class="diamond"></span><span class="rule"></span></div>
+    <div class="eyebrow">WEDDING RECEPTION SPECIAL EVENT</div>
+    <h1 class="title">WEDDING DERBY BINGO</h1>
+    <div class="subtitle">祝福の競馬ビンゴ &mdash; 今宵、栄光の馬番は誰の手に</div>
+
+    <div class="settings-bar">
+      <div class="field">
+        <label for="rangeMin">数字の範囲（最小）</label>
+        <input type="number" id="rangeMin" value="1" min="1">
+      </div>
+      <div class="field">
+        <label for="rangeMax">〜（最大）</label>
+        <input type="number" id="rangeMax" value="75" min="2">
+      </div>
+      <div class="divider"></div>
+      <div class="stock-readout">残りストック：<b id="stockCount">75</b> 個</div>
+      <div class="divider"></div>
+      <button class="btn-reset" id="resetBtn">ゲームをリセット</button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- MAIN: RACE STAGE -->
+    <div class="panel">
+      <div class="panel-title" id="stagePanelTitle">PADDOCK &amp; RACE TRACK</div>
+
+      <div class="stage" id="stage">
+        <div class="commentary-banner" id="commentaryBanner"></div>
+
+        <div class="track-frame">
+          <div class="rail" id="railTop"></div>
+          <span class="start-gate-label">START</span>
+          <span class="goal-label">GOAL</span>
+          <div class="track" id="track"></div>
+          <div class="rail" id="railBottom"></div>
+        </div>
+
+        <!-- paddock parade overlay -->
+        <div class="stage-overlay" id="paddockOverlay">
+          <div class="paddock-inner">
+            <div class="paddock-eyebrow">PADDOCK PARADE</div>
+            <div class="paddock-counter" id="paddockCounter">1 / 10</div>
+            <div class="paddock-yard">
+              <div class="paddock-fence"></div>
+              <div class="paddock-horse-track" id="paddockHorseTrack"></div>
+              <div class="paddock-flavor" id="paddockFlavor"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- countdown overlay -->
+        <div class="stage-overlay" id="countdownOverlay">
+          <div class="countdown-text" id="countdownText">3</div>
+        </div>
+
+        <!-- podium overlay -->
+        <div class="stage-overlay" id="podiumOverlay">
+          <div class="podium-inner">
+            <div class="podium-eyebrow">WINNER'S PODIUM</div>
+            <div class="podium-row" id="podiumRow"></div>
+            <div class="podium-continue">
+              <button class="btn-start" id="continueBtn" style="display:none;">次のレースへ</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="start-row">
+        <button class="btn-start" id="startBtn">レース開始</button>
+      </div>
+    </div>
+
+    <!-- SIDE: RESULTS + HISTORY -->
+    <div class="side-stack">
+      <div class="panel">
+        <div class="panel-title">本レース結果（上位5着）</div>
+        <div id="resultArea">
+          <div class="result-empty">レース開始でビンゴ番号が決定します</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">これまでに開いた番号</div>
+        <div class="history-count" id="historyCount">確定 0 個</div>
+        <div class="history-grid" id="historyGrid"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-note">HORSE No. ARE DRAWN AT RANDOM &mdash; MAY THE FASTEST FIVE BRING YOU LUCK</div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const HORSE_COUNT = 10;
+  const TARGET_RACE_SECONDS = 30;
+  const TALENT_MIN = 0.92;
+  const TALENT_MAX = 1.08;
+  const JITTER_RANGE = 0.3;
+  const PADDOCK_WALK_MS = 1900;     // 1頭が画面を横切る時間
+  const PODIUM_REVEAL_GAP_MS = 850;
+  const RACE_SAFETY_TIMEOUT_MS = 48000;
+
+  const COAT_COLORS   = ['#6b3f1f','#8b5a2b','#3a3a3a','#9b9b93','#c9a06a','#5c4632','#7d5b3f','#4a4a4a','#b08968','#6e5a45'];
+  const JERSEY_COLORS = ['#c4453f','#3a6fb0','#2f8f5b','#e0b13a','#7a4fc4','#d97b3f','#3aa6a6','#c95b9b','#e8e2d0','#4a5fc9'];
+
+  const els = {
+    rangeMin: document.getElementById('rangeMin'),
+    rangeMax: document.getElementById('rangeMax'),
+    stockCount: document.getElementById('stockCount'),
+    resetBtn: document.getElementById('resetBtn'),
+    startBtn: document.getElementById('startBtn'),
+    continueBtn: document.getElementById('continueBtn'),
+    stage: document.getElementById('stage'),
+    track: document.getElementById('track'),
+    commentaryBanner: document.getElementById('commentaryBanner'),
+    paddockOverlay: document.getElementById('paddockOverlay'),
+    paddockCounter: document.getElementById('paddockCounter'),
+    paddockHorseTrack: document.getElementById('paddockHorseTrack'),
+    paddockFlavor: document.getElementById('paddockFlavor'),
+    countdownOverlay: document.getElementById('countdownOverlay'),
+    countdownText: document.getElementById('countdownText'),
+    podiumOverlay: document.getElementById('podiumOverlay'),
+    podiumRow: document.getElementById('podiumRow'),
+    resultArea: document.getElementById('resultArea'),
+    historyGrid: document.getElementById('historyGrid'),
+    historyCount: document.getElementById('historyCount'),
+  };
+
+  // ===== Persisted state =====
+  let confirmedNumbers = [];
+  let isRacing = false;
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem('derbyBingoState');
+      if(raw){
+        const parsed = JSON.parse(raw);
+        if(Array.isArray(parsed.confirmedNumbers)) confirmedNumbers = parsed.confirmedNumbers;
+        if(typeof parsed.rangeMin === 'number') els.rangeMin.value = parsed.rangeMin;
+        if(typeof parsed.rangeMax === 'number') els.rangeMax.value = parsed.rangeMax;
+      }
+    }catch(e){ /* ignore corrupt state */ }
+  }
+  function saveState(){
+    try{
+      localStorage.setItem('derbyBingoState', JSON.stringify({
+        confirmedNumbers,
+        rangeMin: parseInt(els.rangeMin.value, 10),
+        rangeMax: parseInt(els.rangeMax.value, 10)
+      }));
+    }catch(e){ /* storage unavailable; game still works in-memory */ }
+  }
+
+  function getRange(){
+    let min = parseInt(els.rangeMin.value, 10);
+    let max = parseInt(els.rangeMax.value, 10);
+    if(isNaN(min)) min = 1;
+    if(isNaN(max)) max = 75;
+    if(min > max){ const t = min; min = max; max = t; }
+    return { min, max };
+  }
+  function getAvailableNumbers(){
+    const { min, max } = getRange();
+    const all = [];
+    for(let n = min; n <= max; n++){
+      if(!confirmedNumbers.includes(n)) all.push(n);
+    }
+    return all;
+  }
+  function updateStockReadout(){ els.stockCount.textContent = getAvailableNumbers().length; }
+  function renderHistory(){
+    els.historyGrid.innerHTML = '';
+    confirmedNumbers.forEach(num => {
+      const chip = document.createElement('div');
+      chip.className = 'history-chip';
+      chip.textContent = num;
+      els.historyGrid.appendChild(chip);
+    });
+    els.historyCount.textContent = `確定 ${confirmedNumbers.length} 個`;
+  }
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function pickHorseNumbers(){
+    const avail = getAvailableNumbers();
+    if(avail.length < HORSE_COUNT) return null;
+    return shuffle(avail).slice(0, HORSE_COUNT);
+  }
+
+  // ===== Horse SVG component =====
+  function darken(hex, amt){
+    const c = hex.replace('#','');
+    const num = parseInt(c, 16);
+    let r = (num >> 16) - amt, g = ((num >> 8) & 0xff) - amt, b = (num & 0xff) - amt;
+    r = Math.max(0, r); g = Math.max(0, g); b = Math.max(0, b);
+    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  }
+
+  function horseSVG(coat, jersey, number){
+    const dCoat = darken(coat, 40);
+    const outline = darken(coat, 60);
+    return `
+    <svg viewBox="0 0 240 150" xmlns="http://www.w3.org/2000/svg">
+      <g class="horse-rig">
+        <ellipse cx="115" cy="128" rx="95" ry="8" fill="#000000" opacity="0.18"/>
+        <g class="tail-swing">
+          <path d="M58 52 C 30 58, 14 78, 20 104 C 24 86, 36 70, 60 62 Z" fill="${dCoat}" stroke="${outline}" stroke-width="2" stroke-linejoin="round"/>
+        </g>
+        <g class="leg-br"><path d="M70 86 L60 122 L74 122 L82 90 Z" fill="${dCoat}" stroke="${outline}" stroke-width="2" stroke-linejoin="round"/></g>
+        <g class="leg-fr"><path d="M150 88 L144 124 L158 124 L166 92 Z" fill="${dCoat}" stroke="${outline}" stroke-width="2" stroke-linejoin="round"/></g>
+        <path d="M40 70 C 36 50, 60 36, 95 35 C 130 34, 160 40, 172 56 C 180 66, 178 80, 168 90 C 150 100, 110 102, 78 98 C 56 95, 42 86, 40 70 Z" fill="${coat}" stroke="${outline}" stroke-width="2" stroke-linejoin="round"/>
+        <g class="leg-bl"><path d="M58 84 L46 124 L60 124 L70 88 Z" fill="${coat}" stroke="${outline}" stroke-width="2" stroke-linejoin="round"/></g>
+        <g class="leg-fl"><path d="M140 86 L132 124 L146 124 L156 90 Z" fill="${coat}" stroke="${outline}" stroke-width="2" stroke-linejoin="round"/></g>
+        <path d="M158 48 C 168 32, 182 18, 198 14 C 192 24, 186 34, 184 46 C 182 54, 176 60, 168 62 Z" fill="${coat}" stroke="${outline}" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M196 16 C 208 14, 220 18, 226 28 C 220 30, 210 31, 202 36 C 196 30, 194 22, 196 16 Z" fill="${coat}" stroke="${outline}" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M199 14 L204 4 L208 15 Z" fill="${coat}" stroke="${outline}" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M165 22 L172 30 L163 32 L170 40 L160 41 L166 50 L156 50" fill="none" stroke-width="6" stroke-linecap="round" stroke="${dCoat}"/>
+        <circle cx="214" cy="24" r="2.4" fill="#1a1208"/>
+        <rect x="78" y="52" width="34" height="24" rx="3" fill="${jersey}" stroke="#0b1730" stroke-width="1.5"/>
+        <text x="95" y="70" text-anchor="middle" font-size="16" font-weight="700" font-family="Helvetica Neue, Arial, sans-serif" fill="#0b1730">${number}</text>
+        <g>
+          <path d="M118 56 C 122 40, 134 28, 148 28 C 156 28, 162 34, 162 42 L 156 58 C 146 66, 128 66, 118 56 Z" fill="${jersey}" stroke="#0b1730" stroke-width="1.5"/>
+          <circle cx="150" cy="22" r="8" fill="#f0c8a0" stroke="#0b1730" stroke-width="1.2"/>
+          <path d="M142 19 a8 6 0 0 1 16 -1 z" fill="${jersey}"/>
+          <path d="M158 36 L172 30" stroke="${outline}" stroke-width="3" stroke-linecap="round"/>
+        </g>
+      </g>
+    </svg>`;
+  }
+
+  function buildHorseUnit(num, laneIndex, extraClass){
+    const wrap = document.createElement('div');
+    wrap.className = 'horse-unit' + (extraClass ? ' ' + extraClass : '');
+    wrap.innerHTML = horseSVG(COAT_COLORS[laneIndex % COAT_COLORS.length], JERSEY_COLORS[laneIndex % JERSEY_COLORS.length], num);
+    return wrap;
+  }
+
+  // ===== Lane / track building =====
+  function buildLanes(horseNumbers){
+    els.track.innerHTML = '';
+    horseNumbers.forEach((num, i) => {
+      const lane = document.createElement('div');
+      lane.className = 'lane';
+
+      const bib = document.createElement('div');
+      bib.className = 'horse-bib';
+      bib.id = `horse-${i}`;
+      bib.style.left = '0px';
+
+      const unit = buildHorseUnit(num, i, null);
+
+      const dust1 = document.createElement('div');
+      dust1.className = 'dust-puff d1';
+      const dust2 = document.createElement('div');
+      dust2.className = 'dust-puff d2';
+      const s1 = document.createElement('div'); s1.className = 'speed-line s1';
+      const s2 = document.createElement('div'); s2.className = 'speed-line s2';
+      const s3 = document.createElement('div'); s3.className = 'speed-line s3';
+
+      bib.appendChild(unit);
+      bib.appendChild(dust1);
+      bib.appendChild(dust2);
+      bib.appendChild(s1); bib.appendChild(s2); bib.appendChild(s3);
+      lane.appendChild(bib);
+      els.track.appendChild(lane);
+    });
+
+    const finishLine = document.createElement('div');
+    finishLine.className = 'finish-line';
+    els.track.appendChild(finishLine);
+
+    // furlong-style decorative poles along the top rail
+    const railTop = document.getElementById('railTop');
+    railTop.querySelectorAll('.pole').forEach(p => p.remove());
+    const trackWidth = els.track.clientWidth || 1000;
+    const poleCount = 5;
+    for(let p = 1; p < poleCount; p++){
+      const pole = document.createElement('div');
+      pole.className = 'pole';
+      pole.style.left = `${(trackWidth / poleCount) * p}px`;
+      railTop.appendChild(pole);
+    }
+  }
+
+  function getTrackLength(){
+    const trackWidth = els.track.clientWidth;
+    return Math.max(trackWidth - 160, 300);
+  }
+
+  // ===== Paddock parade (full horse walking across the yard) =====
+  function runPaddockParade(horseNumbers){
+    const flavorLines = [
+      n => `${n}番、堂々の入場です！`,
+      n => `${n}番、気合い十分の様子！`,
+      n => `${n}番、落ち着いた足取りで登場！`,
+      n => `${n}番、観客の視線を集めています！`,
+      n => `${n}番、いざ本馬場へ！`
+    ];
+
+    return new Promise(resolve => {
+      els.paddockOverlay.classList.add('show');
+      let i = 0;
+
+      function showNext(){
+        if(i >= horseNumbers.length){
+          els.paddockOverlay.classList.remove('show');
+          els.paddockHorseTrack.innerHTML = '';
+          els.paddockFlavor.textContent = '';
+          resolve();
+          return;
+        }
+        const num = horseNumbers[i];
+        els.paddockCounter.textContent = `${i + 1} / ${horseNumbers.length}`;
+        els.paddockFlavor.textContent = flavorLines[Math.floor(Math.random() * flavorLines.length)](num);
+
+        els.paddockHorseTrack.innerHTML = '';
+        const unit = buildHorseUnit(num, i, 'paddock-walk-anim');
+        unit.querySelector('.horse-rig').classList.add('walk');
+        els.paddockHorseTrack.appendChild(unit);
+
+        const yardWidth = els.paddockHorseTrack.clientWidth || 900;
+        unit.style.left = '-30%';
+        unit.style.transitionDuration = `${PADDOCK_WALK_MS}ms`;
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            unit.style.left = `${yardWidth - 260}px`;
+          });
+        });
+
+        setTimeout(() => {
+          i++;
+          showNext();
+        }, PADDOCK_WALK_MS + 150);
+      }
+      showNext();
+    });
+  }
+
+  // ===== Countdown =====
+  function runCountdown(){
+    return new Promise(resolve => {
+      const sequence = ['3', '2', '1', 'READY...', 'GO!'];
+      let idx = 0;
+      els.countdownOverlay.classList.add('show');
+      function step(){
+        if(idx >= sequence.length){
+          els.countdownOverlay.classList.remove('show');
+          resolve();
+          return;
+        }
+        const text = sequence[idx];
+        els.countdownText.textContent = text;
+        els.countdownText.classList.toggle('go', text === 'GO!');
+        idx++;
+        const delay = text === 'GO!' ? 500 : 700;
+        setTimeout(step, delay);
+      }
+      step();
+    });
+  }
+
+  // ===== Commentary engine =====
+  const PHRASES_EARLY = [
+    n => `${n}番、好スタートを切った！`,
+    n => `${n}番が先頭に立つ！`,
+    n => `序盤は${n}番がハナ差リード！`,
+    () => `全馬かたまっての好スタート！`
+  ];
+  const PHRASES_MID = [
+    n => `${n}番が抜け出した！`,
+    n => `${n}番、粘りの先頭走行！`,
+    n => `後方から${n}番が猛追！`,
+    n => `${n}番、外から差してきた！`,
+    () => `ここで馬群が動いた！`
+  ];
+  const PHRASES_LATE = [
+    n => `残り少ない、${n}番が前に出た！`,
+    n => `${n}番、譲らない走り！`,
+    () => `大接戦、目が離せない展開！`,
+    () => `ここからが勝負所！`
+  ];
+
+  function showCommentary(text){
+    els.commentaryBanner.textContent = text;
+    els.commentaryBanner.classList.remove('show');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => els.commentaryBanner.classList.add('show'));
+    });
+  }
+  function hideCommentary(){ els.commentaryBanner.classList.remove('show'); }
+
+  // ===== Race simulation (time-based, talent + smooth jitter) =====
+  function runRace(horseNumbers){
+    return new Promise(resolve => {
+      const trackLength = getTrackLength();
+      const basePxPerSec = trackLength / TARGET_RACE_SECONDS;
+
+      const horses = horseNumbers.map((num, i) => ({
+        num, i, pos: 0, finished: false, finishTime: null, finishRank: null,
+        talent: TALENT_MIN + Math.random() * (TALENT_MAX - TALENT_MIN),
+        jitterFrom: 0, jitterTo: 0, jitterStart: 0, jitterDuration: 1, jitterChangeAt: 0
+      }));
+
+      let lastFrameTime = performance.now();
+      const raceStart = lastFrameTime;
+      let finishedCount = 0;
+      let nextCommentaryAt = raceStart + 1800;
+      let lastPhrase = '';
+
+      function pickLeaderPhrase(){
+        const running = horses.filter(h => !h.finished);
+        if(running.length === 0) return;
+        const leader = running.reduce((a, b) => (b.pos > a.pos ? b : a), running[0]);
+        const progress = leader.pos / trackLength;
+        let pool = PHRASES_EARLY;
+        if(progress >= 0.7) pool = PHRASES_LATE;
+        else if(progress >= 0.35) pool = PHRASES_MID;
+
+        let phrase, attempts = 0;
+        do{
+          const fn = pool[Math.floor(Math.random() * pool.length)];
+          phrase = fn(leader.num);
+          attempts++;
+        }while(phrase === lastPhrase && attempts < 5);
+        lastPhrase = phrase;
+        showCommentary(phrase);
+      }
+
+      showCommentary('全馬、ゲートイン！');
+
+      function tick(now){
+        const deltaSeconds = Math.min((now - lastFrameTime) / 1000, 0.05);
+        lastFrameTime = now;
+        const elapsedMs = now - raceStart;
+
+        horses.forEach(h => {
+          if(h.finished) return;
+
+          if(now >= h.jitterChangeAt){
+            h.jitterFrom = h.jitterTo;
+            h.jitterTo = (Math.random() - 0.5) * JITTER_RANGE * 2;
+            h.jitterStart = now;
+            h.jitterDuration = 300 + Math.random() * 500;
+            h.jitterChangeAt = now + h.jitterDuration;
+          }
+          const t = Math.min(1, (now - h.jitterStart) / h.jitterDuration);
+          const jitterVal = h.jitterFrom + (h.jitterTo - h.jitterFrom) * t;
+          const speed = basePxPerSec * h.talent * (1 + jitterVal);
+          h.pos += Math.max(speed, basePxPerSec * 0.25) * deltaSeconds;
+
+          if(h.pos >= trackLength || elapsedMs >= RACE_SAFETY_TIMEOUT_MS){
+            h.pos = trackLength;
+            h.finished = true;
+            h.finishTime = elapsedMs;
+            finishedCount++;
+            h.finishRank = finishedCount;
+            const el = document.getElementById(`horse-${h.i}`);
+            if(el){
+              el.classList.remove('running');
+              const rig = el.querySelector('.horse-rig');
+              if(rig) rig.classList.add('still');
+            }
+            if(finishedCount === 1){
+              showCommentary(`${h.num}番、見事1着でゴール！`);
+              nextCommentaryAt = now + 1800;
+            }else if(finishedCount <= 5){
+              showCommentary(`${h.num}番、${finishedCount}着でゴール！`);
+              nextCommentaryAt = now + 1500;
+            }
+          }
+
+          const el = document.getElementById(`horse-${h.i}`);
+          if(el) el.style.left = `${h.pos}px`;
+        });
+
+        if(finishedCount < horses.length && now < raceStart + RACE_SAFETY_TIMEOUT_MS){
+          if(now >= nextCommentaryAt){
+            pickLeaderPhrase();
+            nextCommentaryAt = now + 2000 + Math.random() * 700;
+          }
+          requestAnimationFrame(tick);
+        }else{
+          horses.forEach(h => {
+            if(!h.finished){
+              h.finished = true; h.pos = trackLength; finishedCount++;
+              h.finishTime = elapsedMs + h.i; h.finishRank = finishedCount;
+            }
+          });
+          hideCommentary();
+          resolve(horses);
+        }
+      }
+
+      horses.forEach(h => {
+        const el = document.getElementById(`horse-${h.i}`);
+        if(el) el.classList.add('running');
+      });
+      requestAnimationFrame(tick);
+    });
+  }
+
+  // ===== Podium reveal (suspense order: 5th -> 1st) =====
+  function buildPodiumColumn(rank, num){
+    const col = document.createElement('div');
+    col.className = 'podium-col';
+    col.dataset.rank = rank;
+    col.innerHTML = `<div class="podium-plate">${num}</div><div class="podium-block">${rank}着</div>`;
+    return col;
+  }
+  function spawnConfetti(){
+    const colors = ['#f3d999', '#d4af6a', '#faf7ef', '#8a6f3a'];
+    const count = 40;
+    for(let i = 0; i < count; i++){
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = `${Math.random() * 100}vw`;
+      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+      const duration = 1.6 + Math.random() * 1.2;
+      piece.style.animationDuration = `${duration}s`;
+      piece.style.animationDelay = `${Math.random() * 0.4}s`;
+      document.body.appendChild(piece);
+      setTimeout(() => piece.remove(), (duration + 0.5) * 1000);
+    }
+  }
+  function revealPodium(rankedHorses){
+    return new Promise(resolve => {
+      const top5 = rankedHorses.slice(0, 5);
+      els.podiumRow.innerHTML = '';
+      els.podiumOverlay.classList.add('show');
+
+      const visualOrder = [4, 2, 1, 3, 5];
+      const colsByRank = {};
+      visualOrder.forEach(rank => {
+        const horse = top5[rank - 1];
+        if(!horse) return;
+        const col = buildPodiumColumn(rank, horse.num);
+        colsByRank[rank] = col;
+        els.podiumRow.appendChild(col);
+      });
+
+      const revealOrder = [5, 4, 3, 2, 1];
+      let i = 0;
+      function revealNext(){
+        if(i >= revealOrder.length){ resolve(top5.map(h => h.num)); return; }
+        const rank = revealOrder[i];
+        const col = colsByRank[rank];
+        if(col){
+          col.classList.add('show');
+          if(rank === 1) spawnConfetti();
+        }
+        i++;
+        setTimeout(revealNext, PODIUM_REVEAL_GAP_MS);
+      }
+      revealNext();
+    });
+  }
+
+  // ===== Side-panel result recap =====
+  function revealSideResults(rankedHorses){
+    els.resultArea.innerHTML = '';
+    const top5 = rankedHorses.slice(0, 5);
+    const labels = ['1着', '2着', '3着', '4着', '5着'];
+    let i = 0;
+    function showNext(){
+      if(i >= top5.length) return;
+      const horse = top5[i];
+      const slot = document.createElement('div');
+      slot.className = `result-slot rank-${i + 1}`;
+      slot.innerHTML = `<div class="result-rank">${labels[i]}</div><div class="result-number">${horse.num}</div>`;
+      els.resultArea.appendChild(slot);
+      i++;
+      setTimeout(showNext, PODIUM_REVEAL_GAP_MS);
+    }
+    setTimeout(showNext, PODIUM_REVEAL_GAP_MS);
+  }
+
+  // ===== Main flow =====
+  function setControlsDisabled(disabled){
+    els.startBtn.disabled = disabled;
+    els.rangeMin.disabled = disabled;
+    els.rangeMax.disabled = disabled;
+    els.resetBtn.disabled = disabled;
+  }
+
+  async function startRace(){
+    if(isRacing) return;
+
+    updateStockReadout();
+    const avail = getAvailableNumbers();
+    if(avail.length < HORSE_COUNT){
+      alert(`残りの利用可能な数字が ${avail.length} 個しかありません。10頭分の馬番を確保できないため、レースを開始できません。\n\n設定の範囲を広げる、またはリセットしてください。`);
+      return;
+    }
+    const horseNumbers = pickHorseNumbers();
+    if(!horseNumbers){
+      alert('馬番の選出に失敗しました。範囲設定を確認してください。');
+      return;
+    }
+
+    isRacing = true;
+    setControlsDisabled(true);
+    els.resultArea.innerHTML = '<div class="result-empty">レース進行中…</div>';
+    buildLanes(horseNumbers);
+
+    await runPaddockParade(horseNumbers);
+    await runCountdown();
+    const finishedHorses = await runRace(horseNumbers);
+
+    const ranked = finishedHorses.slice().sort((a, b) => a.finishTime - b.finishTime);
+    revealSideResults(ranked);
+    const winningNumbers = await revealPodium(ranked);
+
+    winningNumbers.forEach(n => { if(!confirmedNumbers.includes(n)) confirmedNumbers.push(n); });
+    renderHistory();
+    updateStockReadout();
+    saveState();
+
+    els.continueBtn.style.display = 'inline-block';
+  }
+
+  function closePodiumAndReset(){
+    els.podiumOverlay.classList.remove('show');
+    els.continueBtn.style.display = 'none';
+    els.track.innerHTML = '';
+    isRacing = false;
+    setControlsDisabled(false);
+  }
+
+  function resetGame(){
+    if(isRacing) return;
+    const ok = confirm('これまでの履歴と確定番号をすべて削除し、最初からやり直します。よろしいですか？');
+    if(!ok) return;
+    confirmedNumbers = [];
+    renderHistory();
+    updateStockReadout();
+    els.resultArea.innerHTML = '<div class="result-empty">レース開始でビンゴ番号が決定します</div>';
+    els.track.innerHTML = '';
+    saveState();
+  }
+
+  // ===== Events =====
+  els.startBtn.addEventListener('click', startRace);
+  els.continueBtn.addEventListener('click', closePodiumAndReset);
+  els.resetBtn.addEventListener('click', resetGame);
+  els.rangeMin.addEventListener('change', () => { updateStockReadout(); saveState(); });
+  els.rangeMax.addEventListener('change', () => { updateStockReadout(); saveState(); });
+
+  // ===== Init =====
+  loadState();
+  renderHistory();
+  updateStockReadout();
+
+})();
+</script>
+
+</body>
+</html>
